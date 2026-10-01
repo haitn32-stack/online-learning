@@ -59,7 +59,7 @@ const getMyRegistrations = async (userId, query) => {
     limit,
     offset,
     include: [
-      { model: Subject, attributes: ['id', 'name', 'thumbnail'] },
+      { model: Subject, attributes: ['id', 'title', 'thumbnail'] },
       { model: PricePackage, attributes: ['id', 'name', 'duration', 'salePrice'] }
     ],
     order: [['createdAt', 'DESC']]
@@ -156,7 +156,7 @@ const getAllRegistrations = async (query) => {
     order,
     include: [
       { model: User, where: userCondition, attributes: ['id', 'email', 'fullName'] },
-      { model: Subject, attributes: ['id', 'name'] },
+      { model: Subject, attributes: ['id', 'title'] },
       { model: PricePackage, attributes: ['id', 'name', 'duration'] }
     ]
   });
@@ -171,7 +171,7 @@ const getRegistrationById = async (id) => {
   const registration = await Registration.findByPk(id, {
     include: [
       { model: User, attributes: ['id', 'email', 'fullName', 'phone'] },
-      { model: Subject, attributes: ['id', 'name', 'thumbnail'] },
+      { model: Subject, attributes: ['id', 'title', 'thumbnail'] },
       { model: PricePackage, attributes: ['id', 'name', 'duration', 'salePrice'] }
     ]
   });

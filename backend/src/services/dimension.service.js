@@ -1,4 +1,4 @@
-const { db } = require('../models');
+const db = require('../models');
 
 /**
  * Find all dimensions for a subject

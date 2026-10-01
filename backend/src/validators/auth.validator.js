@@ -25,10 +25,21 @@ const verifyEmailValidator = [
     param('token').notEmpty().withMessage('Token is required')
 ];
 
+const verifyCodeValidator = [
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('code').notEmpty().withMessage('Verification code is required')
+];
+
+const resendCodeValidator = [
+    body('email').isEmail().withMessage('Valid email is required')
+];
+
 module.exports = {
     registerValidator,
     loginValidator,
     resetPasswordRequestValidator,
     resetPasswordValidator,
-    verifyEmailValidator
+    verifyEmailValidator,
+    verifyCodeValidator,
+    resendCodeValidator
 };

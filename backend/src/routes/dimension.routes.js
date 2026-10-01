@@ -3,7 +3,7 @@ const router = express.Router();
 const dimensionController = require('../controllers/dimension.controller');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
-const { validate } = require('../middlewares/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 const { createDimensionValidator, updateDimensionValidator } = require('../validators/dimension.validator');
 const { ROLES } = require('../constants');
 

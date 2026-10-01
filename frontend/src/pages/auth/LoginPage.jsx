@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Card, Form, Button, Spinner } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Form, Button, Spinner, Alert } from 'react-bootstrap';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../contexts/AuthContext';
-import { login as loginService } from '../../services/auth.service';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuth();
   
   const [formData, setFormData] = useState({
@@ -16,6 +16,14 @@ const LoginPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validated, setValidated] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(null);
+
+  useEffect(() => {
+    if (searchParams.get('verified') === 'true') {
+      toast.success('Xác thực tài khoản thành công! Vui lòng đăng nhập.');
+      setStatusMessage({ type: 'success', text: 'Tài khoản đã được xác thực thành công. Bạn có thể đăng nhập ngay!' });
+    }
+  }, [searchParams]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -36,13 +44,10 @@ const LoginPage = () => {
 
     try {
       setIsSubmitting(true);
-      const response = await loginService(formData.email, formData.password);
-      
-      // Assume response contains user data and token
-      await login(response.data);
-      toast.success('Login successful!');
+      const user = await login(formData.email, formData.password);
+      toast.success('Đăng nhập thành công!');
 
-      const role = response.data.user?.role || 'Student';
+      const role = user?.role || 'Student';
       switch (role) {
         case 'Admin':
           navigate('/admin/users');
@@ -62,7 +67,9 @@ const LoginPage = () => {
           break;
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
+      const errMsg = error.response?.data?.message || error.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+      toast.error(errMsg);
+      setStatusMessage({ type: 'danger', text: errMsg });
     } finally {
       setIsSubmitting(false);
     }
@@ -76,12 +83,25 @@ const LoginPage = () => {
             <Card className="shadow-lg border-0 rounded-lg mt-5 mb-5">
               <Card.Header className="bg-primary text-white text-center py-4">
                 <h3 className="font-weight-light my-2">EduLearn</h3>
-                <p className="mb-0">Login to your account</p>
+                <p className="mb-0">Đăng nhập tài khoản</p>
               </Card.Header>
               <Card.Body className="p-5">
+                {statusMessage && (
+                  <Alert variant={statusMessage.type} dismissible onClose={() => setStatusMessage(null)}>
+                    {statusMessage.text}
+                    {statusMessage.text.includes('kích hoạt') && (
+                      <div className="mt-2">
+                        <Link to={`/verify-code?email=${encodeURIComponent(formData.email)}`} className="alert-link font-weight-bold">
+                          👉 Bấm vào đây để nhập mã xác thực OTP
+                        </Link>
+                      </div>
+                    )}
+                  </Alert>
+                )}
+
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                   <Form.Group className="mb-3" controlId="email">
-                    <Form.Label>Email address</Form.Label>
+                    <Form.Label>Địa chỉ Email</Form.Label>
                     <Form.Control 
                       type="email" 
                       name="email"
@@ -91,22 +111,22 @@ const LoginPage = () => {
                       required 
                     />
                     <Form.Control.Feedback type="invalid">
-                      Please enter a valid email address.
+                      Vui lòng nhập email hợp lệ.
                     </Form.Control.Feedback>
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId="password">
-                    <Form.Label>Password</Form.Label>
+                    <Form.Label>Mật khẩu</Form.Label>
                     <Form.Control 
                       type="password" 
                       name="password"
-                      placeholder="Enter password"
+                      placeholder="Nhập mật khẩu"
                       value={formData.password}
                       onChange={handleChange}
                       required
                     />
                     <Form.Control.Feedback type="invalid">
-                      Please enter your password.
+                      Vui lòng nhập mật khẩu.
                     </Form.Control.Feedback>
                   </Form.Group>
 
@@ -115,19 +135,19 @@ const LoginPage = () => {
                       type="checkbox" 
                       name="rememberMe"
                       id="rememberMe"
-                      label="Remember me" 
+                      label="Ghi nhớ đăng nhập" 
                       checked={formData.rememberMe}
                       onChange={handleChange}
                     />
-                    <Link to="/forgot-password">Forgot Password?</Link>
+                    <Link to="/forgot-password">Quên mật khẩu?</Link>
                   </Form.Group>
 
                   <div className="d-grid gap-2">
                     <Button variant="primary" type="submit" size="lg" disabled={isSubmitting}>
                       {isSubmitting ? (
-                        <><Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Logging in...</>
+                        <><Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Đang đăng nhập...</>
                       ) : (
-                        'Login'
+                        'Đăng nhập'
                       )}
                     </Button>
                   </div>
@@ -135,7 +155,10 @@ const LoginPage = () => {
               </Card.Body>
               <Card.Footer className="text-center py-3 bg-light">
                 <div className="small">
-                  Need an account? <Link to="/register">Sign up!</Link>
+                  Chưa có tài khoản? <Link to="/register">Đăng ký ngay!</Link>
+                </div>
+                <div className="small mt-1">
+                  Đã có mã xác thực? <Link to="/verify-code">Nhập mã OTP kích hoạt</Link>
                 </div>
               </Card.Footer>
             </Card>

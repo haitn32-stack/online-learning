@@ -3,7 +3,7 @@ const router = express.Router();
 const registrationController = require('../controllers/registration.controller');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
-const { validate } = require('../middlewares/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 const {
   createRegistrationValidator,
   updateRegistrationStatusValidator,

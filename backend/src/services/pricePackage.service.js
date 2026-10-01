@@ -1,4 +1,4 @@
-const { db } = require('../models');
+const db = require('../models');
 
 /**
  * Find all packages for a subject, include Subject info

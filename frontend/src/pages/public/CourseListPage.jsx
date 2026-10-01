@@ -31,13 +31,13 @@ const CourseListPage = () => {
       };
       
       const res = await getPublishedSubjects(params);
-      const subjectsData = res.data?.subjects || res.data || [];
-      setTotalPages(res.data?.totalPages || 1);
+      const subjectsData = Array.isArray(res.data) ? res.data : (Array.isArray(res.items) ? res.items : (Array.isArray(res.data?.subjects) ? res.data.subjects : []));
+      setTotalPages(res.totalPages || res.data?.totalPages || 1);
       
       const subjectsWithPrice = await Promise.all(subjectsData.map(async (sub) => {
         try {
           const pkgRes = await getPackagesBySubject(sub.id);
-          const pkgs = pkgRes.data || [];
+          const pkgs = Array.isArray(pkgRes.data) ? pkgRes.data : (Array.isArray(pkgRes.items) ? pkgRes.items : []);
           return { ...sub, pricePackage: pkgs.length > 0 ? pkgs[0] : null };
         } catch (err) {
           return { ...sub, pricePackage: null };
@@ -117,7 +117,7 @@ const CourseListPage = () => {
         ) : (
           <>
             <Row className="g-4 mb-5">
-              {courses.map(course => (
+              {(Array.isArray(courses) ? courses : []).map(course => (
                 <Col key={course.id} xs={12} md={6} lg={4}>
                   <Card className="h-100 shadow-sm border-0 hover-shadow transition">
                     <Link to={`/courses/${course.id}`} className="text-decoration-none text-dark">

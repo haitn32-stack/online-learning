@@ -59,8 +59,8 @@ const getDashboardStats = async () => {
   // 7. Top 5 Popular Subjects
   const topSubjects = await Registration.findAll({
     attributes: ['subjectId', [sequelize.fn('COUNT', sequelize.col('Registration.id')), 'registrationCount']],
-    include: [{ model: Subject, attributes: ['name'] }],
-    group: ['subjectId', 'Subject.id', 'Subject.name'],
+    include: [{ model: Subject, attributes: ['id', 'title'] }],
+    group: ['subjectId', 'Subject.id', 'Subject.title'],
     order: [[sequelize.literal('registrationCount'), 'DESC']],
     limit: 5,
     raw: true,

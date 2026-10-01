@@ -1,4 +1,4 @@
-const { db } = require('../models');
+const db = require('../models');
 const { Quiz, Subject, Question, QuizQuestion, QuizResult, QuizAnswer } = db;
 const { Op } = require('sequelize');
 const { getPagination, getPagingData } = require('../utils/pagination.util');

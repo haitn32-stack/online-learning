@@ -31,8 +31,9 @@ const BlogListPage = () => {
       };
       
       const res = await getPublicBlogs(params);
-      setBlogs(res.data?.blogs || res.data || []);
-      setTotalPages(res.data?.totalPages || 1);
+      const blogsData = Array.isArray(res.data) ? res.data : (Array.isArray(res.items) ? res.items : (Array.isArray(res.data?.blogs) ? res.data.blogs : []));
+      setBlogs(blogsData);
+      setTotalPages(res.totalPages || res.data?.totalPages || 1);
     } catch (error) {
       console.error('Error fetching blogs:', error);
     } finally {
@@ -121,7 +122,7 @@ const BlogListPage = () => {
         ) : (
           <>
             <Row className="g-4 mb-5">
-              {blogs.map(blog => (
+              {(Array.isArray(blogs) ? blogs : []).map(blog => (
                 <Col key={blog.id} xs={12} md={viewMode === 'grid' ? 6 : 12} lg={viewMode === 'grid' ? 4 : 12}>
                   <Card className={`h-100 shadow-sm border-0 hover-shadow transition ${viewMode === 'list' ? 'flex-md-row' : ''}`}>
                     <div className={viewMode === 'list' ? 'col-md-4' : ''}>

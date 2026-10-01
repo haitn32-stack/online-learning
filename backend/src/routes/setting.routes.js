@@ -3,7 +3,7 @@ const router = express.Router();
 const settingController = require('../controllers/setting.controller');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
-const { validate } = require('../middlewares/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 const {
   createSettingValidator,
   updateSettingValidator

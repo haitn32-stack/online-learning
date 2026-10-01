@@ -51,7 +51,7 @@ const PublicLayout = () => {
                   </Button>
                 </>
               ) : (
-                <NavDropdown title={<span className="fw-medium">Hello, {user?.name || 'User'}</span>} id="basic-nav-dropdown" align="end">
+                <NavDropdown title={<span className="fw-medium">Hello, {user?.fullName || user?.name || 'User'}</span>} id="basic-nav-dropdown" align="end">
                   {user?.role === 'Student' ? (
                     <>
                       <NavDropdown.Item as={Link} to="/student/profile">Profile</NavDropdown.Item>

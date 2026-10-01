@@ -3,7 +3,7 @@ const router = express.Router();
 const questionController = require('../controllers/question.controller');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
-const { validate } = require('../middlewares/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 const { createQuestionValidator, updateQuestionValidator, importQuestionsValidator } = require('../validators/question.validator');
 
 router.get('/', authenticate, authorize('Expert', 'Admin'), questionController.getAllQuestions);

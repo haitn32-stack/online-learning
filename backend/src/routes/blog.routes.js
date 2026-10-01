@@ -3,7 +3,7 @@ const router = express.Router();
 const blogController = require('../controllers/blog.controller');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
-const { validate } = require('../middlewares/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 const {
   createBlogValidator,
   updateBlogValidator

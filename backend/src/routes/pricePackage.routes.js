@@ -3,7 +3,7 @@ const router = express.Router();
 const pricePackageController = require('../controllers/pricePackage.controller');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
-const { validate } = require('../middlewares/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 const { createPackageValidator, updatePackageValidator } = require('../validators/pricePackage.validator');
 const { ROLES } = require('../constants');
 

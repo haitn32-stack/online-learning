@@ -3,7 +3,7 @@ const router = express.Router();
 const sliderController = require('../controllers/slider.controller');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
-const { validate } = require('../middlewares/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 const {
   createSliderValidator,
   updateSliderValidator

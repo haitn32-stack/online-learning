@@ -3,7 +3,7 @@ const router = express.Router();
 const lessonController = require('../controllers/lesson.controller');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
-const { validate } = require('../middlewares/validate.middleware');
+const validate = require('../middlewares/validate.middleware');
 const { createLessonValidator, updateLessonValidator } = require('../validators/lesson.validator');
 const { ROLES } = require('../constants');
 

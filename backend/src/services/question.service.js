@@ -1,4 +1,4 @@
-const { db } = require('../models');
+const db = require('../models');
 const { Question, Subject, SubjectDimension } = db;
 const { Op } = require('sequelize');
 const { getPagination, getPagingData } = require('../utils/pagination.util');
@@ -26,7 +26,7 @@ const getAllQuestions = async (query) => {
         limit,
         offset,
         include: [
-            { model: Subject, attributes: ['id', 'name'] },
+            { model: Subject, attributes: ['id', 'title'] },
             { model: SubjectDimension, attributes: ['id', 'name'] }
         ]
     });
@@ -42,7 +42,7 @@ const getAllQuestions = async (query) => {
 const getQuestionById = async (id) => {
     return await Question.findByPk(id, {
         include: [
-            { model: Subject, attributes: ['id', 'name'] },
+            { model: Subject, attributes: ['id', 'title'] },
             { model: SubjectDimension, attributes: ['id', 'name'] }
         ]
     });

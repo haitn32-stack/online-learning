@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Spinner } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { register as registerService } from '../../services/auth.service';
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -63,16 +64,9 @@ const RegisterPage = () => {
         phone: formData.phone
       });
       
-      toast.success('Registration successful! Please check your email to verify your account.');
-      setFormData({
-        fullName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        phone: '',
-        agreeTerms: false
-      });
-      setValidated(false);
+      const targetEmail = formData.email;
+      toast.success('Đăng ký thành công! Vui lòng nhập mã OTP được gửi tới email để kích hoạt tài khoản.');
+      navigate(`/verify-code?email=${encodeURIComponent(targetEmail)}`);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {

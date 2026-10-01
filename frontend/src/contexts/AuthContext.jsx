@@ -17,26 +17,34 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      try {
+        setUser(JSON.parse(storedUser));
+        setIsAuthenticated(true);
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      } catch (e) {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
     }
     setLoading(false);
   }, [token]);
 
+  const setAuthSession = (authToken, authUser) => {
+    localStorage.setItem('token', authToken);
+    localStorage.setItem('user', JSON.stringify(authUser));
+    setToken(authToken);
+    setUser(authUser);
+    setIsAuthenticated(true);
+    api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+  };
+
   const login = async (email, password) => {
     const response = await authService.login(email, password);
-    const { token, user } = response.data;
+    const data = response.data?.data || response.data;
+    const { token: authToken, user: authUser } = data;
     
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    setToken(token);
-    setUser(user);
-    setIsAuthenticated(true);
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    
-    return user;
+    setAuthSession(authToken, authUser);
+    return authUser;
   };
 
   const register = async (data) => {
@@ -63,6 +71,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        setAuthSession
       }}
     >
       {!loading && children}

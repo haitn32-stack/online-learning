@@ -25,14 +25,15 @@ const HomePage = () => {
           getPublicBlogs({ limit: 3 }).catch(() => ({ data: [] }))
         ]);
         
-        setSliders(slidersRes.data || []);
+        const slidersArray = Array.isArray(slidersRes.data) ? slidersRes.data : (Array.isArray(slidersRes.items) ? slidersRes.items : []);
+        setSliders(slidersArray);
         
         // Fetch prices for subjects
-        const subjectsData = subjectsRes.data || [];
+        const subjectsData = Array.isArray(subjectsRes.data) ? subjectsRes.data : (Array.isArray(subjectsRes.items) ? subjectsRes.items : (Array.isArray(subjectsRes.data?.items) ? subjectsRes.data.items : []));
         const subjectsWithPrice = await Promise.all(subjectsData.map(async (sub) => {
           try {
             const pkgRes = await getPackagesBySubject(sub.id);
-            const pkgs = pkgRes.data || [];
+            const pkgs = Array.isArray(pkgRes.data) ? pkgRes.data : (Array.isArray(pkgRes.items) ? pkgRes.items : []);
             return { ...sub, pricePackage: pkgs.length > 0 ? pkgs[0] : null };
           } catch (err) {
             return { ...sub, pricePackage: null };
@@ -40,7 +41,8 @@ const HomePage = () => {
         }));
         
         setCourses(subjectsWithPrice);
-        setBlogs(blogsRes.data || []);
+        const blogsArray = Array.isArray(blogsRes.data) ? blogsRes.data : (Array.isArray(blogsRes.items) ? blogsRes.items : []);
+        setBlogs(blogsArray);
       } catch (error) {
         console.error('Error fetching home data:', error);
       } finally {
@@ -57,7 +59,7 @@ const HomePage = () => {
     <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section">
-        {sliders.length > 0 ? (
+        {Array.isArray(sliders) && sliders.length > 0 ? (
           <Carousel>
             {sliders.map(slider => (
               <Carousel.Item key={slider.id}>
@@ -98,7 +100,7 @@ const HomePage = () => {
             <p className="text-muted">Discover our most popular subjects and start learning today.</p>
           </div>
           <Row className="g-4">
-            {courses.map(course => (
+            {(Array.isArray(courses) ? courses : []).map(course => (
               <Col key={course.id} md={6} lg={4}>
                 <Card className="h-100 shadow-sm border-0 hover-shadow transition">
                   <Card.Img variant="top" src={course.thumbnail || 'https://via.placeholder.com/300x200?text=Course'} style={{ height: '200px', objectFit: 'cover' }} />
@@ -187,7 +189,7 @@ const HomePage = () => {
             <p className="text-muted">Read our latest news, tips, and insights.</p>
           </div>
           <Row className="g-4">
-            {blogs.map(blog => (
+            {(Array.isArray(blogs) ? blogs : []).map(blog => (
               <Col key={blog.id} md={4}>
                 <Card className="h-100 shadow-sm border-0">
                   <Card.Img variant="top" src={blog.thumbnail || 'https://via.placeholder.com/300x200?text=Blog'} style={{ height: '200px', objectFit: 'cover' }} />
