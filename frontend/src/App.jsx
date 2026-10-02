@@ -142,6 +142,10 @@ const App = () => {
           <Route path="/admin/settings/create" element={<SettingFormPage />} />
           <Route path="/admin/settings/edit/:id" element={<SettingFormPage />} />
           <Route path="/admin/subjects" element={<SubjectPublishPage />} />
+        </Route>
+
+        {/* Shared Price Package Route for Admin & Expert */}
+        <Route element={<ProtectedRoute role={['Admin', 'Expert']}><AdminLayout /></ProtectedRoute>}>
           <Route path="/admin/price-packages/:subjectId" element={<PricePackageManagementPage />} />
         </Route>
 

@@ -1,1 +1,2 @@
-export { default } from './common/Loading';
+import Loading from './common/Loading';
+export default Loading;

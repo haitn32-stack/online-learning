@@ -161,7 +161,19 @@ const getAllRegistrations = async (query) => {
     ]
   });
 
-  return getPagingData(data, page, limit);
+  const result = getPagingData(data, page, limit);
+  if (result.items) {
+    result.items = result.items.map(r => {
+      const rObj = r.toJSON();
+      rObj.studentName = rObj.User?.fullName || '';
+      rObj.email = rObj.User?.email || '';
+      rObj.courseTitle = rObj.Subject?.title || '';
+      rObj.packageName = rObj.PricePackage?.name || '';
+      return rObj;
+    });
+  }
+
+  return result;
 };
 
 /**

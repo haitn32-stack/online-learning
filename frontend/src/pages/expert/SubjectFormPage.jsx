@@ -79,7 +79,17 @@ const SubjectFormPage = () => {
         navigate('/expert/subjects');
       }
     } catch (error) {
-      toast.error(error.message || 'An error occurred while saving');
+      const serverMsg = error.response?.data?.message;
+      const validationErrors = error.response?.data?.errors;
+      let errMsg = 'An error occurred while saving';
+      if (validationErrors && Array.isArray(validationErrors)) {
+        errMsg = validationErrors.map(err => err.msg).join(', ');
+      } else if (serverMsg) {
+        errMsg = serverMsg;
+      } else if (error.message) {
+        errMsg = error.message;
+      }
+      toast.error(errMsg);
     } finally {
       setSubmitting(false);
     }
@@ -165,13 +175,14 @@ const SubjectFormPage = () => {
 
                   <Col md={12} className="mb-3">
                     <Form.Group>
-                      <Form.Label>Description</Form.Label>
+                      <Form.Label>Description <span className="text-danger">*</span></Form.Label>
                       <Form.Control 
                         as="textarea" 
                         rows={5}
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
+                        required
                         placeholder="Detailed course description..."
                       />
                     </Form.Group>

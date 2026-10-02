@@ -34,14 +34,14 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Subject.associate = (models) => {
-    Subject.belongsTo(models.Category, { foreignKey: 'categoryId' });
+    Subject.belongsTo(models.Category, { foreignKey: 'categoryId', as: 'category' });
     Subject.belongsTo(models.User, { foreignKey: 'ownerId', as: 'owner' });
-    Subject.hasMany(models.SubjectDimension, { foreignKey: 'subjectId' });
-    Subject.hasMany(models.PricePackage, { foreignKey: 'subjectId' });
-    Subject.hasMany(models.Lesson, { foreignKey: 'subjectId' });
-    Subject.hasMany(models.Question, { foreignKey: 'subjectId' });
-    Subject.hasMany(models.Quiz, { foreignKey: 'subjectId' });
-    Subject.hasMany(models.Registration, { foreignKey: 'subjectId' });
+    Subject.hasMany(models.SubjectDimension, { foreignKey: 'subjectId', as: 'dimensions' });
+    Subject.hasMany(models.PricePackage, { foreignKey: 'subjectId', as: 'pricePackages' });
+    Subject.hasMany(models.Lesson, { foreignKey: 'subjectId', as: 'lessons' });
+    Subject.hasMany(models.Question, { foreignKey: 'subjectId', as: 'questions' });
+    Subject.hasMany(models.Quiz, { foreignKey: 'subjectId', as: 'quizzes' });
+    Subject.hasMany(models.Registration, { foreignKey: 'subjectId', as: 'registrations' });
   };
 
   return Subject;

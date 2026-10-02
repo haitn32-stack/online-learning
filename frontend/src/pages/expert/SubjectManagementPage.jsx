@@ -21,14 +21,15 @@ const SubjectManagementPage = () => {
   const fetchSubjects = async () => {
     try {
       setLoading(true);
-      const data = await getAllSubjects({ 
+      const res = await getAllSubjects({ 
         page: currentPage, 
         search: searchTerm,
         category: categoryFilter,
         status: statusFilter
       });
-      setSubjects(data.subjects || []);
-      setTotalPages(data.totalPages || 1);
+      const subjectList = res.subjects || res.data || res.items || (Array.isArray(res) ? res : []);
+      setSubjects(Array.isArray(subjectList) ? subjectList : []);
+      setTotalPages(res.totalPages || res.data?.totalPages || 1);
     } catch (error) {
       toast.error('Failed to load subjects');
     } finally {

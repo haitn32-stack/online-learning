@@ -24,6 +24,18 @@ api.interceptors.response.use(
 
       if (Array.isArray(payload)) {
         payload.items = payload;
+        payload.users = payload;
+        payload.subjects = payload;
+        payload.registrations = payload;
+        payload.blogs = payload;
+        payload.sliders = payload;
+        payload.quizzes = payload;
+        payload.lessons = payload;
+        payload.questions = payload;
+        payload.dimensions = payload;
+        payload.packages = payload;
+        payload.settings = payload;
+
         if (pagination) {
           payload.totalPages = pagination.totalPages;
           payload.totalItems = pagination.totalItems;
@@ -33,6 +45,17 @@ api.interceptors.response.use(
         }
         response.data = payload;
         response.items = payload;
+        response.users = payload;
+        response.subjects = payload;
+        response.registrations = payload;
+        response.blogs = payload;
+        response.sliders = payload;
+        response.quizzes = payload;
+        response.lessons = payload;
+        response.questions = payload;
+        response.dimensions = payload;
+        response.packages = payload;
+        response.settings = payload;
         response.totalPages = pagination?.totalPages || 1;
         response.totalItems = pagination?.totalItems || payload.length;
       } else if (payload && typeof payload === 'object') {

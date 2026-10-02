@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   PricePackage.associate = (models) => {
-    PricePackage.belongsTo(models.Subject, { foreignKey: 'subjectId' });
+    PricePackage.belongsTo(models.Subject, { foreignKey: 'subjectId', as: 'subject' });
     PricePackage.hasMany(models.Registration, { foreignKey: 'packageId' });
   };
 

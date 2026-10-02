@@ -71,6 +71,7 @@ const UserFormPage = () => {
     try {
       setSubmitting(true);
       const dataToSubmit = { ...formData };
+      if (!dataToSubmit.phone) delete dataToSubmit.phone;
       if (isEditMode) {
         // Don't send empty password on edit
         if (!dataToSubmit.password) delete dataToSubmit.password;
@@ -82,7 +83,17 @@ const UserFormPage = () => {
       }
       navigate('/admin/users');
     } catch (error) {
-      toast.error(error.message || 'An error occurred while saving');
+      const serverMsg = error.response?.data?.message;
+      const validationErrors = error.response?.data?.errors;
+      let errMsg = 'An error occurred while saving';
+      if (validationErrors && Array.isArray(validationErrors)) {
+        errMsg = validationErrors.map(err => err.msg).join(', ');
+      } else if (serverMsg) {
+        errMsg = serverMsg;
+      } else if (error.message) {
+        errMsg = error.message;
+      }
+      toast.error(errMsg);
     } finally {
       setSubmitting(false);
     }

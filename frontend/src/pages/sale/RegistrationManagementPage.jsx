@@ -28,7 +28,7 @@ const RegistrationManagementPage = () => {
   const fetchRegistrations = async () => {
     try {
       setLoading(true);
-      const data = await getAllRegistrations({
+      const res = await getAllRegistrations({
         search: searchTerm,
         status: statusFilter,
         dateFrom,
@@ -38,17 +38,18 @@ const RegistrationManagementPage = () => {
         page: currentPage,
         limit: 10
       });
-      setRegistrations(data.registrations || data);
-      setTotalPages(data.totalPages || 1);
+      const regList = res.registrations || res.data || res.items || (Array.isArray(res) ? res : []);
+      const regArray = Array.isArray(regList) ? regList : [];
+      setRegistrations(regArray);
+      setTotalPages(res.totalPages || res.data?.totalPages || 1);
       
       // Calculate or set summary
-      if (data.summary) {
-        setSummary(data.summary);
+      if (res.summary) {
+        setSummary(res.summary);
       } else {
-        // Mock summary calculation for UI demonstration
         const mockSummary = { Submitted: 0, Paid: 0, Cancelled: 0, Completed: 0 };
-        (data.registrations || data).forEach(r => {
-          if(mockSummary[r.status] !== undefined) mockSummary[r.status]++;
+        regArray.forEach(r => {
+          if (mockSummary[r.status] !== undefined) mockSummary[r.status]++;
         });
         setSummary(mockSummary);
       }

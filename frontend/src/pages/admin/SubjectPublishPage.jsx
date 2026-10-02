@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Table, Badge, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaGlobe, FaGlobeAmericas } from 'react-icons/fa';
+import { FaGlobe, FaGlobeAmericas, FaMoneyBillWave } from 'react-icons/fa';
 import { getAllSubjects, togglePublish } from '../../services/subject.service';
 import Loading from '../../components/Loading';
 import Pagination from '../../components/Pagination';
@@ -19,9 +20,10 @@ const SubjectPublishPage = () => {
   const fetchSubjects = async () => {
     try {
       setLoading(true);
-      const data = await getAllSubjects({ page: currentPage });
-      setSubjects(data.subjects || []);
-      setTotalPages(data.totalPages || 1);
+      const res = await getAllSubjects({ page: currentPage });
+      const subjectList = res.subjects || res.data || res.items || (Array.isArray(res) ? res : []);
+      setSubjects(Array.isArray(subjectList) ? subjectList : []);
+      setTotalPages(res.totalPages || res.data?.totalPages || 1);
     } catch (error) {
       toast.error('Failed to load subjects');
     } finally {
@@ -41,7 +43,7 @@ const SubjectPublishPage = () => {
   const confirmTogglePublish = async () => {
     if (!selectedSubject) return;
     try {
-      await togglePublish(selectedSubject.id);
+      await togglePublish(selectedSubject.id, !selectedSubject.isPublished);
       toast.success(`Course ${selectedSubject.isPublished ? 'unpublished' : 'published'} successfully`);
       fetchSubjects();
     } catch (error) {
@@ -100,6 +102,15 @@ const SubjectPublishPage = () => {
                           >
                             {subject.isPublished ? <FaGlobeAmericas className="me-1"/> : <FaGlobe className="me-1"/>}
                             {subject.isPublished ? 'Unpublish' : 'Publish'}
+                          </Button>
+                          <Button 
+                            as={Link}
+                            to={`/admin/price-packages/${subject.id}`}
+                            variant="outline-success"
+                            size="sm"
+                            className="ms-2"
+                          >
+                            <FaMoneyBillWave className="me-1" /> Packages
                           </Button>
                         </td>
                       </tr>

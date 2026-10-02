@@ -1,1 +1,2 @@
-export { default } from './common/Pagination';
+import Pagination from './common/Pagination';
+export default Pagination;

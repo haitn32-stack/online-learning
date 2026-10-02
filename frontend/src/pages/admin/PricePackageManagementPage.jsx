@@ -14,6 +14,7 @@ const PricePackageManagementPage = () => {
   const [subject, setSubject] = useState(null);
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('add');
@@ -29,15 +30,20 @@ const PricePackageManagementPage = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [subjectData, packagesData] = await Promise.all([
+      setError(null);
+      const [subjectRes, packagesRes] = await Promise.all([
         getSubjectById(subjectId),
         getPackagesBySubject(subjectId)
       ]);
+      const subjectData = subjectRes.data || subjectRes;
+      const packagesList = packagesRes.packages || packagesRes.data || packagesRes.items || (Array.isArray(packagesRes) ? packagesRes : []);
       setSubject(subjectData);
-      setPackages(packagesData || []);
-    } catch (error) {
-      toast.error('Failed to load data');
-      navigate('/admin/subjects'); // Assuming there's a subject list for admin
+      setPackages(Array.isArray(packagesList) ? packagesList : []);
+    } catch (err) {
+      const serverMsg = err.response?.data?.message;
+      const msg = serverMsg || err.message || 'Failed to load course price packages';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -89,14 +95,31 @@ const PricePackageManagementPage = () => {
       }
       fetchData();
       handleCloseModal();
-    } catch (error) {
-      toast.error(error.message || 'Failed to save package');
+    } catch (err) {
+      toast.error(err.message || 'Failed to save package');
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) return <Loading />;
+
+  if (error) {
+    return (
+      <Container fluid className="py-4">
+        <Button variant="outline-secondary" className="mb-3" onClick={() => navigate(-1)}>
+          <FaArrowLeft className="me-2" /> Back
+        </Button>
+        <Card className="shadow-sm border-danger">
+          <Card.Body className="text-center py-5">
+            <h4 className="text-danger mb-3">Error Loading Price Packages</h4>
+            <p className="text-muted">{error}</p>
+            <Button variant="primary" onClick={fetchData}>Try Again</Button>
+          </Card.Body>
+        </Card>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="py-4">

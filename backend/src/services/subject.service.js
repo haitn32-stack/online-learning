@@ -10,8 +10,12 @@ class SubjectService {
         const whereCondition = {};
         if (search) whereCondition.title = { [Op.like]: `%${search}%` };
         if (categoryId) whereCondition.categoryId = categoryId;
-        if (status !== undefined) whereCondition.status = status === 'true';
-        if (published !== undefined) whereCondition.published = published === 'true';
+        if (status !== undefined && status !== '') {
+            whereCondition.status = status === 'Active' || status === 'true' || status === true;
+        }
+        if (published !== undefined && published !== '') {
+            whereCondition.published = published === 'true' || published === true;
+        }
 
         const subjects = await Subject.findAndCountAll({
             where: whereCondition,
@@ -24,7 +28,19 @@ class SubjectService {
             ]
         });
 
-        return getPagingData(subjects, page, limit);
+        const result = getPagingData(subjects, page, limit);
+        if (result.items) {
+            result.items = result.items.map(s => {
+                const sObj = s.toJSON();
+                sObj.thumbnailUrl = sObj.thumbnail || sObj.thumbnailUrl || '';
+                sObj.categoryName = sObj.category ? sObj.category.name : '';
+                sObj.ownerName = sObj.owner ? sObj.owner.fullName : '';
+                sObj.status = sObj.status ? 'Active' : 'Inactive';
+                sObj.isPublished = sObj.published;
+                return sObj;
+            });
+        }
+        return result;
     }
 
     async getSubjectById(id) {
@@ -38,7 +54,6 @@ class SubjectService {
         });
         if (!subject) throw new Error('Subject not found');
 
-        // Assuming lessons count logic
         let lessonsCount = 0;
         if (Lesson) {
             lessonsCount = await Lesson.count({ where: { subjectId: id } });
@@ -46,32 +61,89 @@ class SubjectService {
 
         const subjectData = subject.toJSON();
         subjectData.lessonsCount = lessonsCount;
+        subjectData.thumbnailUrl = subjectData.thumbnail || subjectData.thumbnailUrl || '';
+        subjectData.categoryName = subjectData.category ? subjectData.category.name : '';
+        subjectData.status = subjectData.status ? 'Active' : 'Inactive';
+        subjectData.isPublished = subjectData.published;
         return subjectData;
     }
 
     async createSubject(data, ownerId) {
-        const subject = await Subject.create({
-            ...data,
-            ownerId
-        });
-        return subject;
+        const subjectData = { ...data, ownerId };
+
+        if (subjectData.thumbnailUrl && !subjectData.thumbnail) {
+            subjectData.thumbnail = subjectData.thumbnailUrl;
+        }
+
+        if (subjectData.status !== undefined) {
+            subjectData.status = subjectData.status === 'Active' || subjectData.status === true || subjectData.status === 'true';
+        }
+
+        if (subjectData.categoryId) {
+            subjectData.categoryId = parseInt(subjectData.categoryId, 10);
+            const category = await Category.findByPk(subjectData.categoryId);
+            if (!category) {
+                const categoryNames = { 1: 'IT', 2: 'Business', 3: 'Language' };
+                await Category.create({
+                    id: subjectData.categoryId,
+                    name: categoryNames[subjectData.categoryId] || `Category ${subjectData.categoryId}`,
+                    type: 'Subject'
+                });
+            }
+        }
+
+        const subject = await Subject.create(subjectData);
+        const subjectObj = subject.toJSON();
+        subjectObj.thumbnailUrl = subjectObj.thumbnail || '';
+        subjectObj.status = subjectObj.status ? 'Active' : 'Inactive';
+        subjectObj.isPublished = subjectObj.published;
+        return subjectObj;
     }
 
     async updateSubject(id, data) {
         const subject = await Subject.findByPk(id);
         if (!subject) throw new Error('Subject not found');
 
-        await subject.update(data);
-        return subject;
+        const updateData = { ...data };
+        if (updateData.thumbnailUrl && !updateData.thumbnail) {
+            updateData.thumbnail = updateData.thumbnailUrl;
+        }
+
+        if (updateData.status !== undefined) {
+            updateData.status = updateData.status === 'Active' || updateData.status === true || updateData.status === 'true';
+        }
+
+        if (updateData.categoryId) {
+            updateData.categoryId = parseInt(updateData.categoryId, 10);
+            const category = await Category.findByPk(updateData.categoryId);
+            if (!category) {
+                const categoryNames = { 1: 'IT', 2: 'Business', 3: 'Language' };
+                await Category.create({
+                    id: updateData.categoryId,
+                    name: categoryNames[updateData.categoryId] || `Category ${updateData.categoryId}`,
+                    type: 'Subject'
+                });
+            }
+        }
+
+        await subject.update(updateData);
+        const subjectObj = subject.toJSON();
+        subjectObj.thumbnailUrl = subjectObj.thumbnail || '';
+        subjectObj.status = subjectObj.status ? 'Active' : 'Inactive';
+        subjectObj.isPublished = subjectObj.published;
+        return subjectObj;
     }
 
     async togglePublish(id, published) {
         const subject = await Subject.findByPk(id);
         if (!subject) throw new Error('Subject not found');
 
-        subject.published = published;
+        subject.published = published === true || published === 'true';
         await subject.save();
-        return subject;
+        const subjectObj = subject.toJSON();
+        subjectObj.status = subjectObj.status ? 'Active' : 'Inactive';
+        subjectObj.isPublished = subjectObj.published;
+        return subjectObj;
     }
 
     async getPublishedSubjects(query) {
@@ -93,7 +165,18 @@ class SubjectService {
             ]
         });
 
-        return getPagingData(subjects, page, limit);
+        const result = getPagingData(subjects, page, limit);
+        if (result.items) {
+            result.items = result.items.map(s => {
+                const sObj = s.toJSON();
+                sObj.thumbnailUrl = sObj.thumbnail || sObj.thumbnailUrl || '';
+                sObj.categoryName = sObj.category ? sObj.category.name : '';
+                sObj.status = sObj.status ? 'Active' : 'Inactive';
+                sObj.isPublished = sObj.published;
+                return sObj;
+            });
+        }
+        return result;
     }
 }
 

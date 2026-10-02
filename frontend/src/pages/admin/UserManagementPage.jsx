@@ -21,14 +21,15 @@ const UserManagementPage = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await getAllUsers({ 
+      const res = await getAllUsers({ 
         page: currentPage, 
         search: searchTerm,
         role: roleFilter,
         status: statusFilter
       });
-      setUsers(data.users || []);
-      setTotalPages(data.totalPages || 1);
+      const userList = res.users || res.data || res.items || (Array.isArray(res) ? res : []);
+      setUsers(Array.isArray(userList) ? userList : []);
+      setTotalPages(res.totalPages || res.data?.totalPages || 1);
     } catch (error) {
       toast.error('Failed to load users');
     } finally {

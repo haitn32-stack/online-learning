@@ -5,9 +5,14 @@ const db = require('../models');
  * @param {number} subjectId
  */
 const getPackagesBySubject = async (subjectId) => {
-  return await db.PricePackage.findAll({
+  const pkgs = await db.PricePackage.findAll({
     where: { subjectId },
     include: [{ model: db.Subject, as: 'subject' }]
+  });
+  return pkgs.map(p => {
+    const pObj = p.toJSON();
+    pObj.status = pObj.status ? 'Active' : 'Inactive';
+    return pObj;
   });
 };
 
@@ -16,9 +21,13 @@ const getPackagesBySubject = async (subjectId) => {
  * @param {number} id
  */
 const getPackageById = async (id) => {
-  return await db.PricePackage.findByPk(id, {
+  const pkg = await db.PricePackage.findByPk(id, {
     include: [{ model: db.Subject, as: 'subject' }]
   });
+  if (!pkg) return null;
+  const pObj = pkg.toJSON();
+  pObj.status = pObj.status ? 'Active' : 'Inactive';
+  return pObj;
 };
 
 /**
@@ -26,11 +35,19 @@ const getPackageById = async (id) => {
  * @param {object} data
  */
 const createPackage = async (data) => {
-  const subject = await db.Subject.findByPk(data.subjectId);
+  const pkgData = { ...data };
+  if (pkgData.subjectId) pkgData.subjectId = parseInt(pkgData.subjectId, 10);
+  const subject = await db.Subject.findByPk(pkgData.subjectId);
   if (!subject) {
     throw new Error('Subject not found');
   }
-  return await db.PricePackage.create(data);
+  if (pkgData.status !== undefined) {
+    pkgData.status = pkgData.status === 'Active' || pkgData.status === true || pkgData.status === 'true';
+  }
+  const created = await db.PricePackage.create(pkgData);
+  const pObj = created.toJSON();
+  pObj.status = pObj.status ? 'Active' : 'Inactive';
+  return pObj;
 };
 
 /**
@@ -43,7 +60,14 @@ const updatePackage = async (id, data) => {
   if (!pricePackage) {
     throw new Error('Price Package not found');
   }
-  return await pricePackage.update(data);
+  const updateData = { ...data };
+  if (updateData.status !== undefined) {
+    updateData.status = updateData.status === 'Active' || updateData.status === true || updateData.status === 'true';
+  }
+  await pricePackage.update(updateData);
+  const pObj = pricePackage.toJSON();
+  pObj.status = pObj.status ? 'Active' : 'Inactive';
+  return pObj;
 };
 
 module.exports = {

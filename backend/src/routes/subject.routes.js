@@ -6,10 +6,13 @@ const validate = require('../middlewares/validate.middleware');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
 
+const pricePackageController = require('../controllers/pricePackage.controller');
+
 router.get('/public', subjectController.getPublishedSubjects);
 router.get('/public/:id', subjectController.getSubjectById);
 
 router.get('/', authenticate, authorize('Expert', 'Admin'), subjectController.getAllSubjects);
+router.get('/:id/price-packages', pricePackageController.getPackagesBySubject);
 router.get('/:id', authenticate, authorize('Expert', 'Admin'), subjectController.getSubjectById);
 router.post('/', authenticate, authorize('Expert'), createSubjectValidator, validate, subjectController.createSubject);
 router.put('/:id', authenticate, authorize('Expert', 'Admin'), updateSubjectValidator, validate, subjectController.updateSubject);
